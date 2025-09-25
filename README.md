@@ -1,6 +1,6 @@
 # anonymousCodeContext
 
-![Task formulation](task_formulation.png)
+![Task formulation](task_format.png)
 
 `anonymousCodeContext` is a comprehensive benchmark framework for code generation and evaluation, supporting multiple context engineering strategies including similarity-based retrieval, static analysis, and navigation methods. The project supports LLMs and provides a complete pipeline including prompt generation, code generation, and evaluation.
 
