@@ -1,0 +1,21 @@
+###Example {index}:
+<Input>:
+Function to complete: `{function_name}`   
+Context above:
+```python
+{contexts_above}
+```
+
+Context below:
+```python
+{contexts_below}
+```
+
+The function code to be completed is:
+```python
+{input_code}
+```
+<Output>:
+```python
+{function_code}
+```

@@ -1,0 +1,21 @@
+###Example {index}:
+<Input>:
+Function to complete: `{function_name}`   
+Context above:
+```{language}
+{contexts_above}
+```
+
+Context below:
+```{language}
+{contexts_below}
+```
+
+The function code to be completed is:
+```{language}
+{input_code}
+```
+<Output>:
+```{language}
+{function_code}
+```

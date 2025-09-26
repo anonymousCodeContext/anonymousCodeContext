@@ -1,0 +1,35 @@
+Your task is to generate a complete and correct implementation of the `{function_name}` function within a file, strictly following the requirements, the code context within the file, and all relevant code from the project.
+**Instructions:**
+- Only output the fully implemented function code, without any explanation.
+- Place your code between <code> and </code>.
+- Match the style and logic of the surrounding code context.
+
+**Relevant Codes**
+- Relevant codes can come from any file in the project.
+- Relevant codes should include the source file, the code itself, and an explanation about why this snippet is useful.
+
+The relevant codes are:
+{relevant_codes}
+
+
+**For the code within file:**
+- The code context above the function is provided.
+- The code context below the function is provided.
+- The function signature and requirement is provided.
+
+**Code Context:**
+```Python
+{contexts_above}
+```
+
+The contexts below the function are:
+```Python
+{contexts_below}
+```
+
+Function to be completed:
+```Python
+{input_code}
+```
+
+Completed code:

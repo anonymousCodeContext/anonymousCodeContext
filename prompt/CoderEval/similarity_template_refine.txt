@@ -1,0 +1,32 @@
+Your task is to generate the complete and correct implementation of the specified function, strictly based on the requirements and the provided code file contexts.  
+You will be given several examples to demonstrate the expected input and output format.
+
+**For each example:**
+- The code context above the function is provided.
+- The code context below the function is provided.
+- The function signature and requirement is provided.
+- Your output should be the fully implemented function code, matching the style and logic of the surrounding context.
+
+{examples}
+
+---
+
+**Now, for your task:**
+<Input>:
+Function to complete: `{function_name}`  
+Context above:
+```{language}
+{contexts_above}
+```
+
+Context below:
+```{language}
+{contexts_below}
+```
+
+The function code to be completed is:
+```{language}
+{input_code}
+```
+<Output>:
+(Please reply with only the function code, no extra explanation or text.)

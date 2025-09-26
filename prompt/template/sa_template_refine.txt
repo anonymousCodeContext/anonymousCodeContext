@@ -1,0 +1,36 @@
+Your task is to generate a complete and correct implementation of the `{function_name}` function within a file, strictly following the requirements, the provided code context, and all relevant dependencies.
+**Instructions:**
+- Only output the fully implemented function code, without any explanation.
+- Place your code between <code> and </code>.
+- Match the style and logic of the surrounding code context.
+
+**Dependencies:**
+- The dependencies of the function include all other functions in the file, except for the function that is to be completed.
+- Include dependencies from other files (cross-file dependencies).
+
+The dependencies are:
+```Python
+{dependencies}
+```
+
+**For the provided code file context:**
+- The code context above the function is provided.
+- The code context below the function is provided.
+- The function signature and requirement is provided.
+
+**Code Context:**
+```Python
+{contexts_above}
+```
+
+The contexts below the function are:
+```Python
+{contexts_below}
+```
+
+Function to be completed:
+```Python
+{input_code}
+```
+
+Completed code:

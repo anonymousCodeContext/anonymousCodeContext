@@ -1,0 +1,24 @@
+Your task is to generate the function code based on the requirement and corresponding code file contexts.
+I will give you five examples as task demonstration.
+
+{examples}
+
+<Input>:
+Please complete the {function_name} function in the middle of a file.
+The file contexts above the function are:
+```Python
+{contexts_above}
+```
+
+The file contexts below the function are:
+```Python
+{contexts_below}
+```
+
+The code to be completed is:
+```Python
+{input_code}
+```
+<Output>:
+
+Reply me the corresponding output.

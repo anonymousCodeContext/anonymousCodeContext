@@ -1,0 +1,23 @@
+Please complete the {function_name} function in the middle of a file without any explanation.The code you generate should put between <code> and </code> , and the function signature should be included.
+for example:
+<code>
+def say_hello():
+    print('hello')
+</code>
+
+The contexts above the function are:
+```Python
+{contexts_above}
+```
+
+The contexts below the function are:
+```Python
+{contexts_below}
+```
+
+The code to be completed is:
+```Python
+{input_code}
+```
+
+Completed code:

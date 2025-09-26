@@ -1,0 +1,20 @@
+<Example Input{index}>: 
+Please complete the {function_name} function in the middle of a file.
+The file contexts above the function are:
+```Python
+{contexts_above}
+```
+
+The file contexts below the function are:
+```Python
+{contexts_below}
+```
+
+The code to be completed is:
+```Python
+{input_code}
+```
+<Example Output{index}>:
+```Python
+{function_code}
+```
