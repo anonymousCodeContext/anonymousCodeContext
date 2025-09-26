@@ -1,0 +1,82 @@
+Exec:
+  preprocess:    0 # 
+  make_prompt:   0 #1
+  generate_code: 0 #2
+  postprocess:   2 #2
+  eval:          0
+
+  efficiency_stat: 1          
+  
+ROOT_PATH_GEN: /root/workspace/code/anonymousCodeContext
+EXEC_DATA_DIR: /root/workspace/code/RUN/experiment/simple
+# EXEC_DATA_DIR: /root/workspace/code/RUN/test_tmp
+
+
+RUN_LOG_PATH: ${EXEC_DATA_PATH}/run.log
+
+Dataset:
+  name: CoderEval
+  meta_data: /root/workspace/code/anonymousCodeContext/data/CoderEval/metadata.jsonl
+  source_code: /root/workspace/code/anonymousCodeContext/data/CoderEval/dummy_source_code
+  id_key: namespace
+  language: python
+
+MODEL: gpt
+TASK: baseline_infilling
+MODA: greedy
+
+EXEC_DATA_TASK_PATH: ${EXEC_DATA_DIR}/${Dataset.name}/${TASK}
+EXEC_DATA_PATH: ${EXEC_DATA_TASK_PATH}/${MODEL}/${MODA}
+
+Preprocess:
+  type: infilling
+  output_dir:  ${EXEC_DATA_TASK_PATH}/preprocess/${Preprocess.type}
+
+  baseline:
+    output_path: ${EXEC_DATA_TASK_PATH}/preprocess/raw_elements.jsonl
+  
+  infilling:
+    output_path: /root/workspace/code/anonymousCodeContext/data/CoderEval/elements.jsonl
+    # output_path: ./prompt/deveval_source_code2_prompt_elements.jsonl
+
+  similarity:
+    N: 64
+    method: bm25
+    # output_path: ${EXEC_DATA_TASK_PATH}/preprocess/elements_${Preprocess.similarity.method}_${Preprocess.similarity.N}.jsonl
+    output_path:  /root/workspace/code/anonymousCodeContext/similarity/test_bm25_64.jsonl
+
+
+MakePrompt:
+  
+  type: ${Preprocess.type}
+  max_token_length: 28000
+  context_window: 128000
+  N: 5
+  
+  preprocess_file: ${Preprocess.${Preprocess.type}.output_path}
+  output_path: ${EXEC_DATA_TASK_PATH}/prompt_${MakePrompt.context_window}_${MakePrompt.max_token_length}_${MakePrompt.N}.jsonl
+
+
+GenerateCode:
+  type: infilling
+  prompt_file: ${MakePrompt.output_path}
+  output_dir: ${EXEC_DATA_PATH}/generate_code/
+  api_key_file: ${ROOT_PATH_GEN}/llm_key/key_base.txt 
+  open_key: your key
+  max_concurrent: 20
+  min_count: -1
+
+Postprocess:
+  output_file: /root/workspace/code/CoderEval/docker_mount_out_data/python/postprocess/${TASK}/${MODEL}.jsonl
+
+
+Eval:
+  output_file: ${Postprocess.output_file}
+  log_file: ${EXEC_DATA_PATH}/eval/test_output.jsonl
+  source_code_root: ${Dataset.source_code}
+  data_file: ${Dataset.meta_data}
+  n: 1
+  k: '1'
+
+Stat:
+  llm_output_file: ${GenerateCode.output_dir}/latest.jsonl

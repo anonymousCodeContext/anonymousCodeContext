@@ -1,0 +1,118 @@
+Exec:
+
+
+  preprocess:    0 # 
+  make_prompt:   0 #1
+  generate_code: 0 #2
+  postprocess:   2 #2
+  eval:          0
+
+  efficiency_stat: 0  
+
+
+ROOT_PATH_GEN: /root/workspace/code/anonymousCodeContext
+# EXEC_DATA_DIR: /root/workspace/code/RUN/test_tmp2
+EXEC_DATA_DIR: /root/workspace/code/RUN/experiment/simple
+
+
+RUN_LOG_PATH: ${EXEC_DATA_PATH}/run.log
+
+Dataset:
+  # DevEval, CoderEval
+Dataset:
+  name: CoderEval
+  meta_data: /root/workspace/code/anonymousCodeContext/data/CoderEval/metadata.jsonl
+  source_code: /root/workspace/code/anonymousCodeContext/data/CoderEval/dummy_source_code
+  all_repos_dir: /root/workspace/code/CoderEval/docker_mount_out_data/python/repos
+  id_key: namespace
+  language: python
+
+# gpt, gemini, claude
+MODEL: gpt
+TASK: navigation
+# MODA: sampling
+MODA: greedy
+
+EXEC_DATA_TASK_PATH: ${EXEC_DATA_DIR}/${Dataset.name}/${TASK}
+EXEC_DATA_PATH: ${EXEC_DATA_TASK_PATH}/${MODEL}/${MODA}
+
+Preprocess:
+  # baseline, infilling, similarity
+  type: navigation
+  output_dir:  ${EXEC_DATA_TASK_PATH}/preprocess/${Preprocess.type}
+
+  baseline:
+    output_path: ${EXEC_DATA_TASK_PATH}/preprocess/raw_elements.jsonl
+  
+  infilling:
+    output_path: ${EXEC_DATA_TASK_PATH}/preprocess/raw_elements.jsonl
+
+  similarity:
+    method: cocosoda
+    train_prompt_elem_path: /root/workspace/code/anonymousCodeContext/data/DevEval/prompt_elements_source_code2.jsonl
+    test_meta_data_path: ${Dataset.meta_data}
+    output_dir: ${EXEC_DATA_TASK_PATH}/preprocess/similarity
+    output_path: ${Preprocess.similarity.output_dir}/indexing_${Preprocess.similarity.method}_${Preprocess.similarity.number}.jsonl
+    number: 5
+    # output_path: ${EXEC_DATA_TASK_PATH}/preprocess/elements_${Preprocess.similarity.method}_${Preprocess.similarity.N}.jsonl
+    # output_path:  /root/workspace/code/anonymousCodeContext/data/DevEval/similarity/test_bm25_10.jsonl
+
+    # for Embeding model only
+    train_embedding_path: ${ROOT_PATH_GEN}/data/DevEval/similarity/cocosoda_embeddings_prompt_elements_source_code2.npy
+    test_embedding_path: ${ROOT_PATH_GEN}/data/DevEval/similarity/cocosoda_embeddings_prompt_elements_source_code2_sample_per_proj.npy
+  
+  navigation:
+    prompt_elem_file: /root/workspace/code/anonymousCodeContext/data/CoderEval/elements.jsonl
+    meta_data_path: ${Dataset.meta_data}
+    run_base_dir: /root/workspace/code/RUN/tmp/agent/generate_prompt/coderEval_running_env
+    source_code_path: ${Dataset.all_repos_dir}
+    # model: qwen3
+    max_iterations: 30
+    api_key: your key
+    open_key: your key
+    min_count: -1
+    output_path: /root/workspace/code/RUN/agent_generate_prompt_coderEval/ckpt/${MODEL}/
+
+
+
+MakePrompt:
+  
+  type: ${Preprocess.type}
+  max_token_length: 50000
+  context_window: 128000
+  N: 5
+
+  preprocess_file: ${Preprocess.navigation.output_path}/latest.jsonl
+  elem_data_path: /root/workspace/code/anonymousCodeContext/data/CoderEval/elements.jsonl
+  template_path: /root/workspace/code/anonymousCodeContext/prompt/template/navigation_template_refine.txt
+  meta_data_path: ${Dataset.meta_data}
+  
+  output_path: ${EXEC_DATA_TASK_PATH}/prompt_${MakePrompt.context_window}_${MakePrompt.max_token_length}_${MakePrompt.N}.jsonl
+
+
+GenerateCode:
+  # agent, baseline, infilling, similarity
+  type: agent
+  prompt_file: ${MakePrompt.output_path}
+  output_dir: ${EXEC_DATA_PATH}/generate_code/
+  api_key_file: ${ROOT_PATH_GEN}/llm_key/key1.txt 
+  open_key: your key
+  max_concurrent: 20
+  min_count: -1
+
+Postprocess:
+  output_file: /root/workspace/code/CoderEval/docker_mount_out_data/python/postprocess/${TASK}/${MODEL}.jsonl
+
+
+Eval:
+  output_file: ${Postprocess.output_file}
+  log_file: ${EXEC_DATA_PATH}/eval/test_output.jsonl
+  source_code_root: ${Dataset.source_code}
+  data_file: ${Dataset.meta_data}
+  # n: 5
+  # k: 1,3,5
+  n: 1
+  k: '1'
+
+Stat:
+  llm_output_file: ${GenerateCode.output_dir}/latest.jsonl

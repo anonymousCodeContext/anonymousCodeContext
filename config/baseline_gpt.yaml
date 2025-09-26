@@ -1,0 +1,103 @@
+# the configuration file for running the experiment when you run script langChain_inference_async.py
+# check langChain_inference_async.py for more details
+Exec:
+# 0: not run； 
+# 1: continue run from checkpoint:
+#    if no checkpoint mechanism, if there is output_file, not run, otherwise run
+#    if there is checkpoint mechanism, continue run from checkpoint
+#    only the postprocess does NOT have checkpoint mechanism
+# 2: rerun: delete output_file, rerun 
+
+  preprocess:    0 # 
+  make_prompt:   0 #1
+  generate_code: 0 #2
+  postprocess:   1 #2
+  eval:          2 # if dataset is CoderEval, set to 0, for evaluation for CoderEval will be run inside a docker container
+  efficiency_stat: 1          
+
+# the absloute path to you anonymousCodeContext project
+ROOT_PATH_GEN: /root/workspace/code/anonymousCodeContext 
+# directory of log and data generated when run the experiment
+EXEC_DATA_DIR: /root/workspace/code/RUN/experiment/
+# the path to the log file
+RUN_LOG_PATH: ${EXEC_DATA_PATH}/run.log
+
+Dataset:
+  # DevEval, CoderEval
+  name: DevEval
+  meta_data: /root/workspace/code/anonymousCodeContext/data/DevEval/data_fixed2_sample_pre_proj.jsonl
+  source_code: /root/workspace/code/DevEval/Source_Code2
+  id_key: namespace
+
+# gpt, gemini, claude, qwen, etc... check the create_llm function in langChain_inference_async.py
+MODEL: gpt
+# baseline_infilling, similarity_bm25, similarity_cocosoda, etc...  check the yaml file in config/
+TASK: baseline_infilling
+# do not change this
+MODA: greedy
+
+# do not change this
+EXEC_DATA_TASK_PATH: ${EXEC_DATA_DIR}/${Dataset.name}/${TASK}
+# do not change this
+EXEC_DATA_PATH: ${EXEC_DATA_TASK_PATH}/${MODEL}/${MODA}
+
+Preprocess:
+  #  infilling, similarity, navigation or sa
+  type: infilling
+  output_dir:  ${EXEC_DATA_TASK_PATH}/preprocess/${Preprocess.type}
+
+  # if the Preprocess.type == infilling, infilling part below will be used
+  infilling:
+    output_path: ${EXEC_DATA_TASK_PATH}/preprocess/prompt_elements_source_code2_raw.jsonl
+    # output_path: ./prompt/deveval_source_code2_prompt_elements.jsonl
+
+  # if the Preprocess.type != similarity, similarity part below will be ignored
+  similarity:
+    N: 64
+    method: bm25
+    # output_path: ${EXEC_DATA_TASK_PATH}/preprocess/elements_${Preprocess.similarity.method}_${Preprocess.similarity.N}.jsonl
+    output_path:  /root/workspace/code/anonymousCodeContext/similarity/test_bm25_64.jsonl
+
+# we will save the prompt for easier analysis
+MakePrompt:
+  type: ${Preprocess.type}
+
+  # do not change this
+  max_token_length: 28000
+  context_window: 128000
+  N: 5
+
+  # input for makePrompt. Ane referencen in recursive way is supported
+  preprocess_file: ${Preprocess.${Preprocess.type}.output_path}
+  # output for makePrompt
+  output_path: ${EXEC_DATA_TASK_PATH}/prompt_${MakePrompt.context_window}_${MakePrompt.max_token_length}_${MakePrompt.N}.jsonl
+
+
+GenerateCode:
+  # navigation, infilling, similarity, sa
+  type: infilling
+  prompt_file: ${MakePrompt.output_path}
+  output_dir: ${EXEC_DATA_PATH}/generate_code/
+  api_key_file: ${ROOT_PATH_GEN}/llm_key/key_base.txt 
+  # the max number of concurrent requests to the LLM
+  max_concurrent: 20
+  # the min number of questions to generate, -1 means all questions
+  min_count: -1
+
+Postprocess:
+  # the path to the output file
+  output_file: ${EXEC_DATA_PATH}/postprocess/completion.jsonl
+
+
+Eval:
+  output_file: ${Postprocess.output_file}
+  log_file: ${EXEC_DATA_PATH}/eval/test_output.jsonl
+  source_code_root: ${Dataset.source_code}
+  data_file: ${Dataset.meta_data}
+  # n: 5
+  # k: 1, 3, 5
+  n: 1
+  k: '1'
+
+Stat:
+  llm_output_file: ${GenerateCode.output_dir}/latest.jsonl
