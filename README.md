@@ -4,6 +4,8 @@
 
 `anonymousCodeContext` is a comprehensive benchmark framework for code generation and evaluation, supporting multiple context engineering strategies including similarity-based retrieval, static analysis, and navigation methods. The project supports LLMs and provides a complete pipeline including prompt generation, code generation, and evaluation.
 
+We opensource all the code, prompt, config and processed intermediate results, aiming to achieve one-click reproducible benchmark. For the converted non-repo format dataset CoderEval, we also release our converted vertsion: https://drive.google.com/file/d/1ndUjdIvszja2URrl1FlSzAXIi0c9xoSf/view?usp=drive_link.
+
 ## Features
 
 -   **Context Retrieval Methods**: Supports multiple strategies for obtaining context, including navigation, static analysis, similarity-based retrieval, and baseline approaches.
